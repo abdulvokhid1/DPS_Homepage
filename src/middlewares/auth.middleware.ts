@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 import { Admin } from '../models/Admin';
-import { User } from '../models/Users';
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
@@ -9,20 +8,12 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
   try {
     const decoded = verifyToken(token) as any;
+    const admin = await Admin.findById(decoded.id).select('-password');
+    if (!admin) return res.status(401).json({ message: 'User not found' });
 
-    let user;
-    if (decoded.role === 'admin') {
-      user = await Admin.findById(decoded.id).select('-password');
-    } else {
-      user = await User.findById(decoded.id).select('-password');
-    }
-
-    if (!user) return res.status(401).json({ message: 'User not found' });
-
-    (req as any).user = user;
+    (req as any).admin = admin;
     next();
-  } catch (err) {
-    console.error('JWT verification error:', err);
+  } catch {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
