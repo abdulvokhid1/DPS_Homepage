@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { signToken } from '../utils/jwt';
 import { Admin } from '../models/Admin';
+import { User } from '../models/Users';
 
 export const register = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
@@ -26,7 +27,7 @@ export const login = async (req: Request, res: Response) => {
   const isMatch = await bcrypt.compare(password, admin.password);
   if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-  const token = signToken({ id: admin._id, email: admin.email });
+  const token = signToken({ id: admin._id, email: admin.email, role:admin.role });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -47,4 +48,39 @@ export const getMe = (req: Request, res: Response) => {
   const admin = (req as any).admin;
   if (!admin) return res.status(401).json({ message: 'Unauthorized' });
   return res.json(admin);
+};
+
+
+
+/// // ✅ Get all users, with optional query filters
+export const getAllUsers = async (req: Request, res: Response) => {
+  const { name, email } = req.query;
+
+  let filter: any = {};
+  if (name) filter.name = { $regex: new RegExp(name as string, 'i') };
+  if (email) filter.email = email;
+
+  const users = await User.find(filter).select('-password');
+  res.status(200).json(users);
+};
+
+// ✅ Get one user by email or name
+export const getUserByQuery = async (req: Request, res: Response) => {
+  const { name, email } = req.query;
+
+  if (!name && !email) {
+    return res.status(400).json({ message: 'Please provide name or email' });
+  }
+
+  let filter: any = {};
+  if (name) filter.name = { $regex: new RegExp(name as string, 'i') };
+  if (email) filter.email = email;
+
+  const user = await User.findOne(filter).select('-password');
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  res.status(200).json(user);
 };
