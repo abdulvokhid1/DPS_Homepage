@@ -35,6 +35,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     let user;
     if (decoded.role === 'admin') {
       user = await Admin.findById(decoded.id).select('-password');
+      // -password is used not to show password field in the object returned from the database
     } else {
       user = await User.findById(decoded.id).select('-password');
     }
