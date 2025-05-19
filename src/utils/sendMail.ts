@@ -1,22 +1,22 @@
 /** @format */
 
-// /** @format */
+import nodemailer from "nodemailer";
 
-// import nodemailer from "nodemailer";
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASS,
+  },
+});
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: process.env.MAIL_USER, // use .env for security
-//     pass: process.env.MAIL_PASS,
-//   },
-// });
+export const sendVerificationEmail = async (to: string, token: string) => {
+  const link = `http://localhost:4000/api/user/verify-email?token=${token}`;
 
-// export const sendVerificationEmail = async (email: string, token: string) => {
-//   const link = `http://localhost:4000/api/user/verify-email?token=${token}`;
-//   await transporter.sendMail({
-//     to: email,
-//     subject: "Verify Your Email",
-//     html: `<p>Please verify your email by clicking <a href="${link}">here</a>.</p>`,
-//   });
-// };
+  await transporter.sendMail({
+    from: `"DPS" <${process.env.MAIL_USER}>`,
+    to,
+    subject: "Verify your email",
+    html: `<h3>Click to verify your email:</h3><p><a href="${link}">${link}</a></p>`,
+  });
+};

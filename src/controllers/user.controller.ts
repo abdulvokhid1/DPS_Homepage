@@ -9,6 +9,24 @@ import crypto from "crypto";
 // import { sendVerificationEmail } from '../utils/sendMail';
 import axios from "axios";
 import { requireEnv } from "../config/requireEnv";
+import { sendVerificationEmail } from "../utils/sendMail";
+
+// export const userRegister = async (req: Request, res: Response) => {
+//   const { email, password, name, phone } = req.body;
+
+//   if (!email || !password || !name || !phone) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   const existing = await User.findOne({ email });
+//   if (existing) return res.status(409).json({ message: "User already exists" });
+
+//   const hashed = await bcrypt.hash(password, 12);
+//   const user = new User({ email, password: hashed, name, phone });
+//   await user.save();
+
+//   res.status(201).json({ message: "User registered" });
+// };
 
 export const userRegister = async (req: Request, res: Response) => {
   const { email, password, name, phone } = req.body;
@@ -17,20 +35,28 @@ export const userRegister = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  const existing = await User.findOne({ email });
-  if (existing) return res.status(409).json({ message: "User already exists" });
+  try {
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: "User already exists" });
+    }
 
-  const hashed = await bcrypt.hash(password, 12);
-  const user = new User({ email, password: hashed, name, phone });
-  await user.save();
+    const hashed = await bcrypt.hash(password, 12);
+    const user = new User({ email, password: hashed, name, phone });
 
-  res.status(201).json({ message: "User registered" });
+    await user.save();
+
+    res.status(201).json({ message: "User registered" });
+  } catch (err) {
+    console.error("❌ Registration error:", err);
+    res.status(500).json({ message: "Registration failed" });
+  }
 };
 
 // export const userRegister = async (req: Request, res: Response) => {
-//   const { email, password, name } = req.body;
+//   const { email, password, name, phone } = req.body;
 
-//   if (!email || !password || !name) {
+//   if (!email || !password || !name || !phone) {
 //     return res.status(400).json({ message: "All fields are required" });
 //   }
 
@@ -47,6 +73,7 @@ export const userRegister = async (req: Request, res: Response) => {
 //     email,
 //     password: hashed,
 //     name,
+//     phone,
 //     verified: false,
 //     verifyToken,
 //     verifyTokenExpiry,
@@ -74,7 +101,6 @@ export const userRegister = async (req: Request, res: Response) => {
 //   user.verified = true;
 //   user.verifyToken = undefined;
 //   user.verifyTokenExpiry = undefined;
-
 //   await user.save();
 
 //   res.json({ message: "Email verified successfully. You can now log in." });
@@ -88,6 +114,9 @@ export const userLogin = async (req: Request, res: Response) => {
 
   // const isMatch = await bcrypt.compare(password, user.password);
   // if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+  if (!user.verified) {
+    return res.status(403).json({ message: "Please verify your email first" });
+  }
 
   const isMatch =
     user.password && (await bcrypt.compare(password, user.password));
@@ -181,6 +210,9 @@ export const handleNaverCallback = async (req: Request, res: Response) => {
         verified: true, // ✅ Skip email verification
       });
       await user.save();
+      console.log("✅NEW NAVER USER  REGISTERED:", user);
+    } else {
+      console.log("✅ EXISTING NAVER USER LOGGED IN:", user);
     }
 
     const token = signToken({
@@ -200,5 +232,84 @@ export const handleNaverCallback = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Naver login failed" });
+  }
+};
+
+/////////
+export const googleLoginRedirect = (req: Request, res: Response) => {
+  const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${requireEnv(
+    "GOOGLE_CLIENT_ID"
+  )}&redirect_uri=${encodeURIComponent(
+    requireEnv("GOOGLE_CALLBACK_URL")
+  )}&scope=openid%20email%20profile&state=googleLogin&access_type=offline`;
+
+  res.redirect(redirectUrl);
+};
+
+export const handleGoogleCallback = async (req: Request, res: Response) => {
+  const { code } = req.query;
+
+  try {
+    // 1. Exchange code for access token
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      null,
+      {
+        params: {
+          code,
+          client_id: requireEnv("GOOGLE_CLIENT_ID"),
+          client_secret: requireEnv("GOOGLE_CLIENT_SECRET"),
+          redirect_uri: requireEnv("GOOGLE_CALLBACK_URL"),
+          grant_type: "authorization_code",
+        },
+      }
+    );
+
+    const accessToken = tokenRes.data.access_token;
+
+    // 2. Get user info
+    const profileRes = await axios.get(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const { email, name } = profileRes.data;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        email,
+        name,
+        provider: "google",
+        verified: true,
+      });
+      await user.save();
+      console.log("🆕 Registered new Google user:", user);
+    } else {
+      console.log("🆕 Existing Google user logged in:", user);
+    }
+
+    const token = signToken({
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.redirect("http://localhost:3000");
+  } catch (err) {
+    console.error("❌ Google login error:", err);
+    res.status(500).json({ message: "Google login failed" });
   }
 };

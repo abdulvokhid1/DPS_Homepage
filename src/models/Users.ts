@@ -44,7 +44,10 @@ const UserSchema = new mongoose.Schema(
 
     role: { type: String, default: "user" },
     provider: { type: String, default: "local" },
+    //     // ✅ Email verification fields
     verified: { type: Boolean, default: false },
+    verifyToken: { type: String },
+    verifyTokenExpiry: { type: Date },
   },
   {
     timestamps: true,
