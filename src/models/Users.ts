@@ -41,7 +41,19 @@ const UserSchema = new mongoose.Schema(
         return this.provider === "local";
       },
     },
-
+    birthday: {
+      type: String,
+      required: true,
+      match: /^\d{4}-\d{2}-\d{2}$/, // Regex to enforce format
+    },
+    bank: {
+      type: String,
+      required: true,
+    },
+    account: {
+      type: String,
+      required: true,
+    },
     role: { type: String, default: "user" },
     provider: { type: String, default: "local" },
     //     // ✅ Email verification fields

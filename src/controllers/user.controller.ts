@@ -29,9 +29,17 @@ import { sendVerificationEmail } from "../utils/sendMail";
 // };
 
 export const userRegister = async (req: Request, res: Response) => {
-  const { email, password, name, phone } = req.body;
+  const { email, password, name, phone, birthday, bank, account } = req.body;
 
-  if (!email || !password || !name || !phone) {
+  if (
+    !email ||
+    !password ||
+    !name ||
+    !phone ||
+    !birthday ||
+    !account ||
+    !bank
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -42,7 +50,15 @@ export const userRegister = async (req: Request, res: Response) => {
     }
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = new User({ email, password: hashed, name, phone });
+    const user = new User({
+      email,
+      password: hashed,
+      name,
+      phone,
+      birthday,
+      bank,
+      account,
+    });
 
     await user.save();
 
