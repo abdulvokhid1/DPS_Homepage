@@ -8,6 +8,8 @@ import {
   userMe,
   naverLoginRedirect,
   handleNaverCallback,
+  handleGoogleCallback,
+  googleLoginRedirect,
 } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
@@ -21,5 +23,8 @@ router.get("/me", authMiddleware, userMe);
 
 router.get("/naver", naverLoginRedirect);
 router.get("/naver/callback", handleNaverCallback);
+
+router.get("/google", googleLoginRedirect);
+router.get("/google/callback", handleGoogleCallback);
 
 export default router;
