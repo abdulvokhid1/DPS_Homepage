@@ -11,23 +11,6 @@ import axios from "axios";
 import { requireEnv } from "../config/requireEnv";
 import { sendVerificationEmail } from "../utils/sendMail";
 
-// export const userRegister = async (req: Request, res: Response) => {
-//   const { email, password, name, phone } = req.body;
-
-//   if (!email || !password || !name || !phone) {
-//     return res.status(400).json({ message: "All fields are required" });
-//   }
-
-//   const existing = await User.findOne({ email });
-//   if (existing) return res.status(409).json({ message: "User already exists" });
-
-//   const hashed = await bcrypt.hash(password, 12);
-//   const user = new User({ email, password: hashed, name, phone });
-//   await user.save();
-
-//   res.status(201).json({ message: "User registered" });
-// };
-
 export const userRegister = async (req: Request, res: Response) => {
   const { email, password, name, phone, birthday, bank, account } = req.body;
 
@@ -59,6 +42,11 @@ export const userRegister = async (req: Request, res: Response) => {
       bank,
       account,
     });
+    // if (!user.verified) {
+    //   return res
+    //     .status(401)
+    //     .json({ message: "Please verify your email before registering" });
+    // }
 
     await user.save();
 
@@ -130,9 +118,9 @@ export const userLogin = async (req: Request, res: Response) => {
 
   // const isMatch = await bcrypt.compare(password, user.password);
   // if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
-  if (!user.verified) {
-    return res.status(403).json({ message: "Please verify your email first" });
-  }
+  // if (!user.verified) {
+  //   return res.status(403).json({ message: "Please verify your email first" });
+  // }
 
   const isMatch =
     user.password && (await bcrypt.compare(password, user.password));
@@ -329,3 +317,79 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Google login failed" });
   }
 };
+
+//////// KakaoLogin
+
+// export const kakaoLoginRedirect = (req: Request, res: Response) => {
+//   const redirectUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${process.env.KAKAO_REST_API_KEY}&redirect_uri=${process.env.KAKAO_CALLBACK_URL}`;
+//   console.log("🌐 Redirecting to Kakao:", redirectUrl);
+//   res.redirect(redirectUrl);
+// };
+
+// export const handleKakaoCallback = async (req: Request, res: Response) => {
+//   const { code } = req.query;
+
+//   try {
+//     // 1. Exchange code for access token
+//     const tokenRes = await axios.post(
+//       "https://kauth.kakao.com/oauth/token",
+//       null,
+//       {
+//         params: {
+//           grant_type: "authorization_code",
+//           client_id: process.env.KAKAO_REST_API_KEY,
+//           redirect_uri: process.env.KAKAO_CALLBACK_URL,
+//           code,
+//         },
+//         headers: { "Content-type": "application/x-www-form-urlencoded" },
+//       }
+//     );
+
+//     const accessToken = tokenRes.data.access_token;
+
+//     // 2. Get user profile
+//     const profileRes = await axios.get("https://kapi.kakao.com/v2/user/me", {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//         "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+//       },
+//     });
+
+//     const kakaoAccount = profileRes.data.kakao_account;
+//     const email = kakaoAccount.email;
+//     const name = kakaoAccount.profile.nickname;
+
+//     let user = await User.findOne({ email });
+
+//     if (!user) {
+//       user = new User({
+//         email,
+//         name,
+//         provider: "kakao",
+//         verified: true,
+//       });
+//       await user.save();
+//       console.log("🆕 Registered new Kakao user:", user);
+//     } else {
+//       console.log("🆕 Existing Kakao user logged in:", user);
+//     }
+
+//     const token = signToken({
+//       id: user._id,
+//       email: user.email,
+//       role: user.role,
+//     });
+
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       sameSite: "lax",
+//       secure: process.env.NODE_ENV === "production",
+//       maxAge: 24 * 60 * 60 * 1000,
+//     });
+
+//     res.redirect("http://localhost:3000");
+//   } catch (err) {
+//     console.error("❌ Kakao login failed:", err);
+//     res.status(500).json({ message: "Kakao login failed" });
+//   }
+// };

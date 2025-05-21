@@ -27,4 +27,7 @@ router.get("/naver/callback", handleNaverCallback);
 router.get("/google", googleLoginRedirect);
 router.get("/google/callback", handleGoogleCallback);
 
+// router.get("/kakao", kakaoLoginRedirect);
+// router.get("/kakao/callback", handleKakaoCallback);
+
 export default router;
