@@ -43,23 +43,29 @@ const UserSchema = new mongoose.Schema(
     },
     birthday: {
       type: String,
-      required: true,
+      required: function (this: any) {
+        return this.provider === "local";
+      },
       match: /^\d{4}-\d{2}-\d{2}$/, // Regex to enforce format
     },
     bank: {
       type: String,
-      required: true,
+      required: function (this: any) {
+        return this.provider === "local";
+      },
     },
     account: {
       type: String,
-      required: true,
+      required: function (this: any) {
+        return this.provider === "local";
+      },
     },
     role: { type: String, default: "user" },
     provider: { type: String, default: "local" },
     //     // ✅ Email verification fields
     verified: { type: Boolean, default: false },
-    verifyToken: { type: String },
-    verifyTokenExpiry: { type: Date },
+    verifyCode: { type: String },
+    verifyCodeExpiry: { type: Date },
   },
   {
     timestamps: true,
