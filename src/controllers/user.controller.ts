@@ -12,9 +12,9 @@ import { requireEnv } from "../config/requireEnv";
 import { sendVerificationEmail } from "../utils/sendMail";
 
 export const userRegister = async (req: Request, res: Response) => {
-  const { email, password, name, phone, birthday, bank, account } = req.body;
+  const { email, password, name, phone } = req.body;
 
-  if (!email || !password || !name || !phone || !birthday) {
+  if (!email || !password || !name || !phone) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -30,7 +30,6 @@ export const userRegister = async (req: Request, res: Response) => {
       password: hashed,
       name,
       phone,
-      birthday,
     });
 
     await user.save();
