@@ -41,13 +41,13 @@ const UserSchema = new mongoose.Schema(
         return this.provider === "local";
       },
     },
-    birthday: {
-      type: String,
-      required: function (this: any) {
-        return this.provider === "local";
-      },
-      match: /^\d{4}-\d{2}-\d{2}$/, // Regex to enforce format
-    },
+    // birthday: {
+    //   type: String,
+    //   required: function (this: any) {
+    //     return this.provider === "local";
+    //   },
+    //   match: /^\d{4}-\d{2}-\d{2}$/, // Regex to enforce format
+    // },
     // bank: {
     //   type: String,
     //   required: function (this: any) {
