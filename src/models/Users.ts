@@ -41,6 +41,8 @@ const UserSchema = new mongoose.Schema(
         return this.provider === "local";
       },
     },
+    note: { type: String, default: "" },
+
     // birthday: {
     //   type: String,
     //   required: function (this: any) {
