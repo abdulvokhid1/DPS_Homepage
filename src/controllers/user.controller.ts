@@ -9,7 +9,6 @@ import crypto from "crypto";
 // import { sendVerificationEmail } from '../utils/sendMail';
 import axios from "axios";
 import { requireEnv } from "../config/requireEnv";
-import { sendVerificationEmail } from "../utils/sendMail";
 
 export const userRegister = async (req: Request, res: Response) => {
   const { email, password, name, phone } = req.body;
@@ -66,6 +65,81 @@ export const userLogin = async (req: Request, res: Response) => {
 
   res.json({ message: "Logged in" });
 };
+
+import { ExchangeInquiry } from "../models/ExchangeInquiry";
+import { sendTelegramMessage } from "../utils/sendTelegram";
+
+// export const submitExchangeInquiry = async (req: Request, res: Response) => {
+//   const { name, phone, age, exchange, experience, callTime } = req.body;
+
+//   // Basic validation
+//   if (!name || !phone || !age || !exchange || !experience || !callTime) {
+//     return res
+//       .status(400)
+//       .json({ message: "All fields are required for inquiry." });
+//   }
+
+//   // (Optional) Validate age and phone format
+//   const ageNum = Number(age);
+//   if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+//     return res.status(400).json({ message: "Invalid age" });
+//   }
+
+//   try {
+//     const inquiry = new ExchangeInquiry({
+//       name,
+//       phone,
+//       age: ageNum,
+//       exchange,
+//       experience,
+//       callTime,
+//     });
+
+//     await inquiry.save();
+
+//     res.status(201).json({ message: "Inquiry submitted successfully" });
+//   } catch (err) {
+//     console.error("❌ Inquiry submission error:", err);
+//     res.status(500).json({ message: "Failed to submit inquiry" });
+//   }
+// };
+
+export const submitExchangeInquiry = async (req: Request, res: Response) => {
+  const { name, phone, age, exchange, experience, callTime } = req.body;
+
+  if (!name || !phone || !age || !exchange || !experience || !callTime) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  const ageNum = Number(age);
+  if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
+    return res.status(400).json({ message: "Invalid age" });
+  }
+
+  try {
+    const inquiry = new ExchangeInquiry({
+      name,
+      phone,
+      age: ageNum,
+      exchange,
+      experience,
+      callTime,
+    });
+
+    await inquiry.save();
+
+    // ✅ Send Telegram notification
+    const message = `📥 *New Exchange Inquiry*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n💱 Exchange: ${exchange}\n📈 Experience: ${experience}\n🕒 Call Time: ${callTime}`;
+    await sendTelegramMessage(message);
+
+    res.status(201).json({ message: "Inquiry submitted successfully" });
+  } catch (err) {
+    console.error("❌ Inquiry submission error:", err);
+    res.status(500).json({ message: "Failed to submit inquiry" });
+  }
+};
+
+/////////
 
 export const userLogout = (req: Request, res: Response) => {
   res.clearCookie("token");
@@ -240,3 +314,7 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Google login failed" });
   }
 };
+
+//// 7943821859:AAG85Q99p8nKJA9s377AUm3hC2Dm_1IIylw
+
+// https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates

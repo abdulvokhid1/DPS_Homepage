@@ -4,7 +4,13 @@ import { Router } from "express";
 import * as AuthController from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminOnly } from "../middlewares/adminOnly";
-import { getAllUsers, getUserByQuery } from "../controllers/auth.controller";
+import {
+  getAllUsers,
+  getExchangeUsers,
+  getUserByQuery,
+  updateExchangeUserNote,
+  updateUserNote,
+} from "../controllers/auth.controller";
 
 const router = Router();
 
@@ -18,5 +24,13 @@ router.get("/me", authMiddleware, AuthController.getMe);
 // Admin-only routes
 router.get("/users", authMiddleware, adminOnly, getAllUsers);
 router.get("/user", authMiddleware, adminOnly, getUserByQuery);
+router.get("/exchangeUsers", authMiddleware, adminOnly, getExchangeUsers);
+router.patch("/users/:id/note", authMiddleware, adminOnly, updateUserNote);
+router.patch(
+  "/exchangeUsers/:id/note",
+  authMiddleware,
+  adminOnly,
+  updateExchangeUserNote
+);
 
 export default router;

@@ -10,6 +10,7 @@ import {
   handleNaverCallback,
   handleGoogleCallback,
   googleLoginRedirect,
+  submitExchangeInquiry,
 } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
@@ -17,6 +18,7 @@ const router = Router();
 
 router.post("/register", userRegister);
 router.post("/login", userLogin);
+router.post("/exchange-inquiry", submitExchangeInquiry);
 router.post("/logout", authMiddleware, userLogout);
 router.get("/me", authMiddleware, userMe);
 // router.get("/verify-email", verifyEmail);
