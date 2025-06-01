@@ -105,9 +105,9 @@ import { sendTelegramMessage } from "../utils/sendTelegram";
 // };
 
 export const submitExchangeInquiry = async (req: Request, res: Response) => {
-  const { name, phone, age, exchange, experience, callTime } = req.body;
+  const { name, phone, age, callTime } = req.body;
 
-  if (!name || !phone || !age || !exchange || !experience || !callTime) {
+  if (!name || !phone || !age || !callTime) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -121,15 +121,13 @@ export const submitExchangeInquiry = async (req: Request, res: Response) => {
       name,
       phone,
       age: ageNum,
-      exchange,
-      experience,
       callTime,
     });
 
     await inquiry.save();
 
     // ✅ Send Telegram notification
-    const message = `📥 *New Exchange Inquiry*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n💱 Exchange: ${exchange}\n📈 Experience: ${experience}\n🕒 Call Time: ${callTime}`;
+    const message = `📥 *New Exchange Inquiry*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n🕒 Call Time: ${callTime}`;
     await sendTelegramMessage(message);
 
     res.status(201).json({ message: "Inquiry submitted successfully" });
