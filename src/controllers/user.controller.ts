@@ -130,10 +130,10 @@ export const submitExchangeInquiry = async (req: Request, res: Response) => {
     const message = `📥 *New Exchange Inquiry*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n🕒 Call Time: ${callTime}`;
     await sendTelegramMessage(message);
 
-    res.status(201).json({ message: "Inquiry submitted successfully" });
+    res.status(201).json({ message: "문의가 정상적으로 등록되었습니다!" });
   } catch (err) {
     console.error("❌ Inquiry submission error:", err);
-    res.status(500).json({ message: "Failed to submit inquiry" });
+    res.status(500).json({ message: "제출에 실패했습니다." });
   }
 };
 
@@ -312,7 +312,3 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Google login failed" });
   }
 };
-
-//// 7943821859:AAG85Q99p8nKJA9s377AUm3hC2Dm_1IIylw
-
-// https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
