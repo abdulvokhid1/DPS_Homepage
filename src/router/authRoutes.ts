@@ -5,6 +5,8 @@ import * as AuthController from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminOnly } from "../middlewares/adminOnly";
 import {
+  createQA,
+  getAllQAs,
   getAllUsers,
   getExchangeUsers,
   getUserByQuery,
@@ -33,4 +35,6 @@ router.patch(
   updateExchangeUserNote
 );
 
+router.post("/qa", authMiddleware, adminOnly, createQA);
+router.get("/qa", getAllQAs); // public access to view Q&As
 export default router;
