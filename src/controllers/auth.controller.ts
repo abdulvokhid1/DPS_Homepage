@@ -3,7 +3,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { signToken } from "../utils/jwt";
-import { Admin } from "../models/Admin";
+import { Admin, QA } from "../models/Admin";
 import { User } from "../models/Users";
 import { ExchangeInquiry } from "../models/ExchangeInquiry";
 
@@ -138,5 +138,30 @@ export const updateExchangeUserNote = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Note update error:", err);
     res.status(500).json({ message: "Failed to update note" });
+  }
+};
+
+// Create new QA
+export const createQA = async (req: Request, res: Response) => {
+  try {
+    const { question, answer } = req.body;
+    const newQA = await QA.create({
+      question,
+      answer,
+      // createdBy: req.user.id, // from authMiddleware
+    });
+    res.status(201).json(newQA);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create Q&A" });
+  }
+};
+
+// Get all QAs
+export const getAllQAs = async (_req: Request, res: Response) => {
+  try {
+    const qas = await QA.find().sort({ createdAt: -1 });
+    res.json(qas);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch Q&As" });
   }
 };
