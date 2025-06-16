@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "dotenv -e .env.dev -- ts-node-dev --respawn --transpile-only src/server.ts",
     "prod": "dotenv -e .env.prod -- node dist/server.js",
-    "build": "tsc",
-    "prepare": "npm install"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
