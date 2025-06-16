@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://dps-homepage.onrender.com", // ✅ replace with your actual Vercel domain
+      "https://dps-homepage-front-ex9e.vercel.app/", // ✅ replace with your actual Vercel domain
     ],
     credentials: true,
   })
