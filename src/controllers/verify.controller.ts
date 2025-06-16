@@ -1,16 +1,8 @@
 /** @format */
 
-// controllers/verify.controller.ts
-import crypto from "crypto";
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import { signToken } from "../utils/jwt";
 import { User } from "../models/Users";
 import nodemailer from "nodemailer";
-// import { sendVerificationEmail } from '../utils/sendMail';
-import axios from "axios";
-import { requireEnv } from "../config/requireEnv";
-import { sendVerificationEmail } from "../utils/sendMail";
 
 export const sendVerificationCode = async (req: Request, res: Response) => {
   const { email } = req.body;

@@ -4,8 +4,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { signToken } from "../utils/jwt";
 import { User } from "../models/Users";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
 // import { sendVerificationEmail } from '../utils/sendMail';
 import axios from "axios";
 import { requireEnv } from "../config/requireEnv";
@@ -68,41 +66,6 @@ export const userLogin = async (req: Request, res: Response) => {
 
 import { ExchangeInquiry } from "../models/ExchangeInquiry";
 import { sendTelegramMessage } from "../utils/sendTelegram";
-
-// export const submitExchangeInquiry = async (req: Request, res: Response) => {
-//   const { name, phone, age, exchange, experience, callTime } = req.body;
-
-//   // Basic validation
-//   if (!name || !phone || !age || !exchange || !experience || !callTime) {
-//     return res
-//       .status(400)
-//       .json({ message: "All fields are required for inquiry." });
-//   }
-
-//   // (Optional) Validate age and phone format
-//   const ageNum = Number(age);
-//   if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-//     return res.status(400).json({ message: "Invalid age" });
-//   }
-
-//   try {
-//     const inquiry = new ExchangeInquiry({
-//       name,
-//       phone,
-//       age: ageNum,
-//       exchange,
-//       experience,
-//       callTime,
-//     });
-
-//     await inquiry.save();
-
-//     res.status(201).json({ message: "Inquiry submitted successfully" });
-//   } catch (err) {
-//     console.error("❌ Inquiry submission error:", err);
-//     res.status(500).json({ message: "Failed to submit inquiry" });
-//   }
-// };
 
 export const submitExchangeInquiry = async (req: Request, res: Response) => {
   const { name, phone, age, callTime } = req.body;
