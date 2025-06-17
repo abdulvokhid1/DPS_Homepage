@@ -10,12 +10,13 @@ import trackRoutes from "./router/trackRoutes";
 const app = express();
 
 // Allow requests from frontend
+
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      // "https://dps-homepage-front-ex9e.vercel.app",
-      "https://metaselferral.com", // ✅ if you will use this later
+      "https://dps-homepage-front-ex9e.vercel.app",
+      "https://www.metaselferral.com", // ✅ Add this line
     ],
     credentials: true,
   })
