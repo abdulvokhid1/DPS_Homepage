@@ -20,4 +20,5 @@ RUN npm run build
 EXPOSE 80
 
 # Start the server
-CMD ["npm", "run", "prod"]
+CMD ["sh", "-c", "dotenv -e .env.prod -- node dist/server.js"]
+
