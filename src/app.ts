@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./router/authRoutes";
 import routes from "./router/routes";
 import cors from "cors";
+import trackRoutes from "./router/trackRoutes";
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.get("/", (req, res) => {
 });
 app.use("/api/admin", authRoutes);
 app.use("/api/user", routes);
+app.use("/api", trackRoutes);
 
 export default app;
