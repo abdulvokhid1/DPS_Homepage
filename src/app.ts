@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://dps-homepage-front-ex9e.vercel.app",
+      // "https://dps-homepage-front-ex9e.vercel.app",
       "https://metaselferral.com", // ✅ if you will use this later
     ],
     credentials: true,
