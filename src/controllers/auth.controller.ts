@@ -37,6 +37,19 @@ export const login = async (req: Request, res: Response) => {
     role: admin.role,
   });
 
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true, // force this!
+    sameSite: "none",
+    domain: ".metaselferral.com",
+    path: "/",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  return res.json({ message: "Logged in" });
+};
+
+export const logout = (req: Request, res: Response) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: true,
@@ -44,12 +57,6 @@ export const login = async (req: Request, res: Response) => {
     domain: ".metaselferral.com",
     path: "/",
   });
-
-  return res.json({ message: "Logged in" });
-};
-
-export const logout = (req: Request, res: Response) => {
-  res.clearCookie("token");
   return res.json({ message: "Logged out" });
 };
 
