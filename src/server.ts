@@ -1,4 +1,8 @@
 /** @format */
+import dotenv from "dotenv";
+
+// Load env file explicitly in production mode
+dotenv.config({ path: ".env.prod" });
 
 import app from "./app";
 import { connectDB } from "./config/db";
