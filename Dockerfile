@@ -16,9 +16,8 @@ COPY . .
 # Build TypeScript code
 RUN npm run build
 
-# Expose the port
-EXPOSE 80
+# Expose the correct port (your app runs on 3000)
+EXPOSE 3000
 
-# Start the server
+# Start the server using dotenv and your prod env
 CMD ["sh", "-c", "dotenv -e .env.prod -- node dist/server.js"]
-
