@@ -56,11 +56,9 @@ export const userLogin = async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true, // force this!
-    sameSite: "none",
-    domain: ".metaselferral.com",
-    path: "/",
-    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === "production", // ✅ cookie only over HTTPS
+    sameSite: "none", // ✅ allow cross-site cookie
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
   res.json({ message: "Logged in" });
