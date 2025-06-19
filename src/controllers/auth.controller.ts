@@ -39,9 +39,10 @@ export const login = async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true, // force this!
     sameSite: "none",
-    domain: ".metaselferral.com", // <-- ADD THIS LINE
+    domain: ".metaselferral.com",
+    path: "/",
     maxAge: 24 * 60 * 60 * 1000,
   });
 
