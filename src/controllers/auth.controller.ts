@@ -37,13 +37,12 @@ export const login = async (req: Request, res: Response) => {
     role: admin.role,
   });
 
-  res.cookie("token", token, {
+  res.clearCookie("token", {
     httpOnly: true,
-    secure: true, // force this!
+    secure: true,
     sameSite: "none",
     domain: ".metaselferral.com",
     path: "/",
-    maxAge: 24 * 60 * 60 * 1000,
   });
 
   return res.json({ message: "Logged in" });
