@@ -39,9 +39,9 @@ export const login = async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === "production", // make sure it's "production"
+    sameSite: "none", // <- VERY important for cross-domain cookie
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
   return res.json({ message: "Logged in" });

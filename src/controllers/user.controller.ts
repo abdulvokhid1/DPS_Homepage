@@ -56,9 +56,9 @@ export const userLogin = async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === "production", // ✅ cookie only over HTTPS
+    sameSite: "none", // ✅ allow cross-site cookie
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
   res.json({ message: "Logged in" });
@@ -185,12 +185,12 @@ export const handleNaverCallback = async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none", // ← WAS "lax", MUST BE "none"
       secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    res.redirect("http://localhost:3000"); // ✅ redirect to frontend
+    res.redirect("https://dps-homepage-front.vercel.app"); // ✅ redirect to frontend
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Naver login failed" });
@@ -261,15 +261,14 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
       email: user.email,
       role: user.role,
     });
-
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none", // ← WAS "lax", MUST BE "none"
       secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
-    res.redirect("http://localhost:3000");
+    res.redirect("https://dps-homepage-front.vercel.app");
   } catch (err) {
     console.error("❌ Google login error:", err);
     res.status(500).json({ message: "Google login failed" });
