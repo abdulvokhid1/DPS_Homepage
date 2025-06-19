@@ -1,23 +1,5 @@
 /** @format */
 
-// in a new file like src/router/trackRoutes.ts
-// import { Router } from "express";
-// import Visitor from "../models/Visitor";
-// const router = Router();
-
-// router.post("/track-visitor", async (req, res) => {
-//   const { visitorId } = req.body;
-//   if (!visitorId) return res.status(400).json({ message: "Missing visitorId" });
-
-//   const exists = await Visitor.findOne({ visitorId });
-//   if (!exists) {
-//     await Visitor.create({ visitorId });
-//   }
-
-//   res.sendStatus(200);
-// });
-
-// export default router;
 import { Router } from "express";
 import geoip from "geoip-lite";
 import Visitor from "../models/Visitor";
@@ -48,6 +30,17 @@ router.post("/track-visitor", async (req, res) => {
   }
 
   res.sendStatus(200);
+});
+
+// ✅ Add this GET route
+router.get("/visitors", async (req, res) => {
+  try {
+    const visitors = await Visitor.find().sort({ visitedAt: -1 }).limit(100);
+    res.json(visitors);
+  } catch (error) {
+    console.error("Error fetching visitors:", error);
+    res.status(500).json({ message: "Failed to fetch visitors" });
+  }
 });
 
 export default router;
