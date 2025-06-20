@@ -264,9 +264,10 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
     });
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "none", // ← WAS "lax", MUST BE "none"
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: true,
+      sameSite: "none",
+      domain: ".metaselferral.com", // ✅ allows both www and api subdomains
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.redirect("https://dps-homepage-front.vercel.app");
