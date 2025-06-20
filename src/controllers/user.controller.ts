@@ -104,7 +104,13 @@ export const submitExchangeInquiry = async (req: Request, res: Response) => {
 /////////
 
 export const userLogout = (req: Request, res: Response) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    domain: ".metaselferral.com",
+    path: "/",
+  });
   res.json({ message: "Logged out" });
 };
 
