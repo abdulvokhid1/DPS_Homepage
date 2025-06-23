@@ -6,6 +6,7 @@ import geoip from "geoip-lite";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminOnly } from "../middlewares/adminOnly";
 import { UAParser } from "ua-parser-js";
+import axios from "axios";
 
 const router = express.Router();
 
@@ -27,7 +28,8 @@ router.post("/track", async (req, res) => {
       req.socket.remoteAddress ||
       "unknown";
 
-    const geo = geoip.lookup(ip);
+    const geoRes = await axios.get(`https://ipapi.co/${ip}/json/`);
+    const geo = geoRes.data;
     const parser = new UAParser(req.headers["user-agent"]);
     const ua = parser.getResult();
 
@@ -35,9 +37,9 @@ router.post("/track", async (req, res) => {
       fingerprint,
       ip,
       userAgent: req.headers["user-agent"],
-      country: geo?.country,
-      region: geo?.region,
-      city: geo?.city,
+      country: geo?.country_name || "unknown",
+      region: geo?.region || "unknown",
+      city: geo?.city || "unknown",
       device: ua.device?.type || "desktop",
       browser: ua.browser.name || "unknown",
       os: ua.os.name || "unknown",
