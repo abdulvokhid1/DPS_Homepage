@@ -1,45 +1,53 @@
 /** @format */
 
-import { Router } from "express";
-import geoip from "geoip-lite";
+import express from "express";
 import Visitor from "../models/Visitor";
+import geoip from "geoip-lite";
+import UAParser from "ua-parser-js";
+import { authMiddleware } from "../middlewares/auth.middleware";
+import { adminOnly } from "../middlewares/adminOnly";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/track-visitor", async (req, res) => {
-  const { fingerprint } = req.body;
-  const ip =
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0] ||
-    req.socket?.remoteAddress ||
-    "unknown";
+// Track visitor
+router.post("/track", async (req, res) => {
+  try {
+    const ip =
+      req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
+      req.socket.remoteAddress ||
+      "unknown";
 
-  if (!fingerprint)
-    return res.status(400).json({ error: "Missing fingerprint" });
-
-  const exists = await Visitor.findOne({ fingerprint });
-  if (!exists) {
     const geo = geoip.lookup(ip);
+    const parser = new UAParser(req.headers["user-agent"]);
+    const ua = parser.getResult();
 
     await Visitor.create({
-      fingerprint,
+      fingerprint: req.body.fingerprint,
       ip,
-      country: geo?.country || null,
-      region: geo?.region || null,
-      city: geo?.city || null,
+      userAgent: req.headers["user-agent"],
+      country: geo?.country,
+      region: geo?.region,
+      city: geo?.city,
+      device: ua.device?.type || "desktop",
+      browser: ua.browser.name || "unknown",
+      os: ua.os.name || "unknown",
     });
-  }
 
-  res.sendStatus(200);
+    res.status(204).end();
+  } catch (err) {
+    console.error("❌ Failed to track visitor:", err);
+    res.status(500).json({ message: "Failed to track visitor" });
+  }
 });
 
-// ✅ Add this GET route
-router.get("/visitors", async (req, res) => {
+// Admin view
+router.get("/", authMiddleware, adminOnly, async (req, res) => {
   try {
-    const visitors = await Visitor.find().sort({ visitedAt: -1 }).limit(100);
+    const visitors = await Visitor.find().sort({ visitedAt: -1 });
     res.json(visitors);
-  } catch (error) {
-    console.error("Error fetching visitors:", error);
-    res.status(500).json({ message: "Failed to fetch visitors" });
+  } catch (err) {
+    console.error("❌ Failed to fetch visitors:", err);
+    res.status(500).json({ message: "Error fetching visitors" });
   }
 });
 

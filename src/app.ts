@@ -31,6 +31,6 @@ app.get("/", (req, res) => {
 });
 app.use("/api/admin", authRoutes);
 app.use("/api/user", routes);
-app.use("/api", trackRoutes);
+app.use("/api/visitors", trackRoutes);
 
 export default app;

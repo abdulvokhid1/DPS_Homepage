@@ -10,15 +10,24 @@
 
 // export default mongoose.model("Visitor", visitorSchema);
 
+// models/Visit.ts
 import mongoose from "mongoose";
 
-const VisitorSchema = new mongoose.Schema({
-  fingerprint: { type: String, required: true, unique: true },
+const visitorSchema = new mongoose.Schema({
+  fingerprint: String,
   ip: String,
   country: String,
   region: String,
   city: String,
-  visitedAt: { type: Date, default: Date.now },
+  device: String,
+  browser: String,
+  os: String,
+  userAgent: String,
+  visitedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-export default mongoose.model("Visitor", VisitorSchema);
+export default mongoose.models.Visitor ||
+  mongoose.model("Visitor", visitorSchema);
