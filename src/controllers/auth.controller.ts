@@ -173,3 +173,32 @@ export const getAllQAs = async (_req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch Q&As" });
   }
 };
+
+// Update QA
+export const updateQA = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { question, answer } = req.body;
+    const updatedQA = await QA.findByIdAndUpdate(
+      id,
+      { question, answer },
+      { new: true }
+    );
+    if (!updatedQA) return res.status(404).json({ message: "Q&A not found" });
+    res.json(updatedQA);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update Q&A" });
+  }
+};
+
+// Delete QA
+export const deleteQA = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const deleted = await QA.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "Q&A not found" });
+    res.json({ message: "Q&A deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete Q&A" });
+  }
+};

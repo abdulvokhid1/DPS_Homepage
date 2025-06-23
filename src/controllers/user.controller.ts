@@ -91,7 +91,7 @@ export const submitExchangeInquiry = async (req: Request, res: Response) => {
     await inquiry.save();
 
     // ✅ Send Telegram notification
-    const message = `📥 *New Exchange Inquiry*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n🕒 Call Time: ${callTime}`;
+    const message = `📥 *New Request*\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n🎂 Age: ${age}\n🕒 Call Time: ${callTime}`;
     await sendTelegramMessage(message);
 
     res.status(201).json({ message: "문의가 정상적으로 등록되었습니다!" });
