@@ -38,7 +38,7 @@ router.patch(
 );
 
 router.post("/qa", authMiddleware, adminOnly, createQA);
-router.get("/qa", authMiddleware, adminOnly, getAllQAs); // public access to view Q&As
+router.get("/qa", getAllQAs); // public access to view Q&As
 router.put("/qa/:id", authMiddleware, adminOnly, updateQA);
 router.delete("/qa/:id", authMiddleware, adminOnly, deleteQA);
 export default router;
