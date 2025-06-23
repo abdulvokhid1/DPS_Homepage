@@ -25,6 +25,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.set("trust proxy", true);
 
 app.get("/", (req, res) => {
   res.send("Backend is up and running");

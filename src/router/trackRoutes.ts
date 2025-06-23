@@ -24,17 +24,26 @@ router.post("/track", async (req, res) => {
     }
 
     const ip =
-      req.headers["x-forwarded-for"]?.toString().split(",")[0].trim() ||
-      req.ip ||
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0].trim() ||
       req.socket.remoteAddress ||
       "unknown";
+
+    console.log("📡 IP received:", ip);
+
     let geo = { country_name: "unknown", region: "unknown", city: "unknown" };
 
-    try {
-      const geoRes = await axios.get(`https://ipapi.co/${ip}/json/`);
-      geo = geoRes.data;
-    } catch (err: any) {
-      console.warn("🌐 Failed IP geolocation", err.message);
+    if (
+      !ip.startsWith("192.") &&
+      !ip.startsWith("172.") &&
+      !ip.startsWith("10.") &&
+      ip !== "127.0.0.1"
+    ) {
+      try {
+        const geoRes = await axios.get(`https://ipapi.co/${ip}/json/`);
+        geo = geoRes.data;
+      } catch (err: any) {
+        console.warn("🌐 Failed IP geolocation", err.message);
+      }
     }
     const parser = new UAParser(req.headers["user-agent"]);
     const ua = parser.getResult();
