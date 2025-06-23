@@ -24,12 +24,18 @@ router.post("/track", async (req, res) => {
     }
 
     const ip =
-      req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
+      req.headers["x-forwarded-for"]?.toString().split(",")[0].trim() ||
+      req.ip ||
       req.socket.remoteAddress ||
       "unknown";
+    let geo = { country_name: "unknown", region: "unknown", city: "unknown" };
 
-    const geoRes = await axios.get(`https://ipapi.co/${ip}/json/`);
-    const geo = geoRes.data;
+    try {
+      const geoRes = await axios.get(`https://ipapi.co/${ip}/json/`);
+      geo = geoRes.data;
+    } catch (err: any) {
+      console.warn("🌐 Failed IP geolocation", err.message);
+    }
     const parser = new UAParser(req.headers["user-agent"]);
     const ua = parser.getResult();
 
