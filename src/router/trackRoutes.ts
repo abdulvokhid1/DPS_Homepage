@@ -3,9 +3,9 @@
 import express from "express";
 import Visitor from "../models/Visitor";
 import geoip from "geoip-lite";
-import UAParser from "ua-parser-js";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminOnly } from "../middlewares/adminOnly";
+import { UAParser } from "ua-parser-js";
 
 const router = express.Router();
 
