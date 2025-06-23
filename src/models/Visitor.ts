@@ -11,6 +11,7 @@
 // export default mongoose.model("Visitor", visitorSchema);
 
 // models/Visit.ts
+
 import mongoose from "mongoose";
 
 const visitorSchema = new mongoose.Schema({
@@ -29,4 +30,5 @@ const visitorSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Visitor", visitorSchema);
+export default mongoose.models.Visitor ||
+  mongoose.model("Visitor", visitorSchema);
