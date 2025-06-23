@@ -12,6 +12,16 @@ const router = express.Router();
 // Track visitor
 router.post("/track", async (req, res) => {
   try {
+    const fingerprint = req.body.fingerprint;
+    if (!fingerprint) {
+      return res.status(400).json({ message: "Missing fingerprint" });
+    }
+
+    const existing = await Visitor.findOne({ fingerprint });
+    if (existing) {
+      return res.status(200).json({ message: "Already tracked" });
+    }
+
     const ip =
       req.headers["x-forwarded-for"]?.toString().split(",")[0] ||
       req.socket.remoteAddress ||
@@ -22,7 +32,7 @@ router.post("/track", async (req, res) => {
     const ua = parser.getResult();
 
     await Visitor.create({
-      fingerprint: req.body.fingerprint,
+      fingerprint,
       ip,
       userAgent: req.headers["user-agent"],
       country: geo?.country,
@@ -33,7 +43,7 @@ router.post("/track", async (req, res) => {
       os: ua.os.name || "unknown",
     });
 
-    res.status(204).end();
+    res.status(201).json({ message: "Visitor tracked" });
   } catch (err) {
     console.error("❌ Failed to track visitor:", err);
     res.status(500).json({ message: "Failed to track visitor" });
