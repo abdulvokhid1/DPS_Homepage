@@ -207,6 +207,10 @@ export const reorderQAs = async (req: Request, res: Response) => {
   try {
     const newOrderList: { _id: string; order: number }[] = req.body;
 
+    if (!Array.isArray(newOrderList)) {
+      return res.status(400).json({ message: "Invalid input format" });
+    }
+
     const bulkOps = newOrderList.map((item) => ({
       updateOne: {
         filter: { _id: item._id },
@@ -215,8 +219,9 @@ export const reorderQAs = async (req: Request, res: Response) => {
     }));
 
     await QA.bulkWrite(bulkOps);
-    res.json({ message: "Order updated" });
+    res.json({ message: "Order updated successfully" });
   } catch (err) {
+    console.error("🔥 Reorder error:", err);
     res.status(500).json({ message: "Failed to reorder Q&As" });
   }
 };
