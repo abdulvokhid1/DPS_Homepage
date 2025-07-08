@@ -203,25 +203,32 @@ export const deleteQA = async (req: Request, res: Response) => {
 };
 
 // PUT /admin/qa/reorder
+// controllers/qaController.ts
+
 export const reorderQAs = async (req: Request, res: Response) => {
   try {
-    const newOrderList: { _id: string; order: number }[] = req.body;
+    const list = req.body;
 
-    if (!Array.isArray(newOrderList)) {
-      return res.status(400).json({ message: "Invalid input format" });
+    if (!Array.isArray(list)) {
+      return res.status(400).json({ message: "Payload must be an array" });
     }
 
-    const bulkOps = newOrderList.map((item) => ({
+    if (!list.every((item) => item._id && typeof item.order === "number")) {
+      return res.status(400).json({ message: "Invalid format in payload" });
+    }
+
+    const ops = list.map((item) => ({
       updateOne: {
         filter: { _id: item._id },
         update: { $set: { order: item.order } },
       },
     }));
 
-    await QA.bulkWrite(bulkOps);
-    res.json({ message: "Order updated successfully" });
-  } catch (err) {
-    console.error("🔥 Reorder error:", err);
-    res.status(500).json({ message: "Failed to reorder Q&As" });
+    const result = await QA.bulkWrite(ops);
+
+    res.json({ message: "Order updated", result });
+  } catch (err: any) {
+    console.error("🔥 Reorder controller error:", err.message || err);
+    res.status(500).json({ message: "Failed to update Q&A" });
   }
 };
