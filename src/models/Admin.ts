@@ -18,6 +18,7 @@ const QASchema = new mongoose.Schema(
   {
     question: { type: String, required: true },
     answer: { type: String, required: true },
+    order: { type: Number, default: 0 },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

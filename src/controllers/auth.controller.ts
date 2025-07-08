@@ -153,11 +153,10 @@ export const updateExchangeUserNote = async (req: Request, res: Response) => {
 export const createQA = async (req: Request, res: Response) => {
   try {
     const { question, answer } = req.body;
-    const newQA = await QA.create({
-      question,
-      answer,
-      // createdBy: req.user.id, // from authMiddleware
-    });
+    const maxQA = await QA.findOne().sort("-order").exec();
+    const newOrder = maxQA ? maxQA.order + 1 : 0;
+
+    const newQA = await QA.create({ question, answer, order: newOrder });
     res.status(201).json(newQA);
   } catch (err) {
     res.status(500).json({ message: "Failed to create Q&A" });
@@ -167,7 +166,7 @@ export const createQA = async (req: Request, res: Response) => {
 // Get all QAs
 export const getAllQAs = async (_req: Request, res: Response) => {
   try {
-    const qas = await QA.find().sort({ createdAt: -1 });
+    const qas = await QA.find().sort({ order: 1 });
     res.json(qas);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch Q&As" });
@@ -200,5 +199,24 @@ export const deleteQA = async (req: Request, res: Response) => {
     res.json({ message: "Q&A deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Failed to delete Q&A" });
+  }
+};
+
+// PUT /admin/qa/reorder
+export const reorderQAs = async (req: Request, res: Response) => {
+  try {
+    const newOrderList: { _id: string; order: number }[] = req.body;
+
+    const bulkOps = newOrderList.map((item) => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { order: item.order } },
+      },
+    }));
+
+    await QA.bulkWrite(bulkOps);
+    res.json({ message: "Order updated" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to reorder Q&As" });
   }
 };

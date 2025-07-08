@@ -11,6 +11,7 @@ import {
   getAllUsers,
   getExchangeUsers,
   getUserByQuery,
+  reorderQAs,
   updateExchangeUserNote,
   updateQA,
   updateUserNote,
@@ -41,4 +42,5 @@ router.post("/qa", authMiddleware, adminOnly, createQA);
 router.get("/qa", getAllQAs); // public access to view Q&As
 router.put("/qa/:id", authMiddleware, adminOnly, updateQA);
 router.delete("/qa/:id", authMiddleware, adminOnly, deleteQA);
+router.put("/qa/reorder", authMiddleware, adminOnly, reorderQAs);
 export default router;
