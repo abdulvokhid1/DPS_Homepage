@@ -214,21 +214,26 @@ export const reorderQAs = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Payload must be an array" });
     }
 
-    if (!list.every((item) => item._id && typeof item.order === "number")) {
-      return res.status(400).json({ message: "Invalid format in payload" });
-    }
-
-    const ops = list.map((item) => ({
-      updateOne: {
-        filter: { _id: new mongoose.Types.ObjectId(item._id) },
-        update: { $set: { order: item.order } },
-      },
-    }));
+    const ops = list.map((item) => {
+      if (!item._id || typeof item.order !== "number") {
+        throw new Error("Invalid item in array: missing _id or order");
+      }
+      return {
+        updateOne: {
+          filter: { _id: new mongoose.Types.ObjectId(item._id) },
+          update: { $set: { order: item.order } },
+        },
+      };
+    });
 
     const result = await QA.bulkWrite(ops);
-    res.json({ message: "Order updated successfully", result });
+    res.json({ message: "Order updated", result });
   } catch (err: any) {
-    console.error("🔥 Reorder controller error:", err.message || err);
-    res.status(500).json({ message: "Failed to update Q&A" });
+    // ⛔ TEMPORARY: send back full error for visibility
+    res.status(500).json({
+      message: "Failed to update Q&A",
+      error: err.message || err.toString(),
+      stack: err.stack || "no stack",
+    });
   }
 };
