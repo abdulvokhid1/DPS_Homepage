@@ -6,6 +6,7 @@ import { signToken } from "../utils/jwt";
 import { Admin, QA } from "../models/Admin";
 import { User } from "../models/Users";
 import { ExchangeInquiry } from "../models/ExchangeInquiry";
+import mongoose from "mongoose";
 
 export const register = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
@@ -219,14 +220,13 @@ export const reorderQAs = async (req: Request, res: Response) => {
 
     const ops = list.map((item) => ({
       updateOne: {
-        filter: { _id: item._id },
+        filter: { _id: new mongoose.Types.ObjectId(item._id) },
         update: { $set: { order: item.order } },
       },
     }));
 
     const result = await QA.bulkWrite(ops);
-
-    res.json({ message: "Order updated", result });
+    res.json({ message: "Order updated successfully", result });
   } catch (err: any) {
     console.error("🔥 Reorder controller error:", err.message || err);
     res.status(500).json({ message: "Failed to update Q&A" });
