@@ -59,6 +59,7 @@ export const userLogin = async (req: Request, res: Response) => {
     secure: true,
     sameSite: "none",
     domain: ".metaselferral.com", // ✅ allows both www and api subdomains
+    path: "/",
     maxAge: 24 * 60 * 60 * 1000,
   });
 

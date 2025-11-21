@@ -6,7 +6,7 @@ import authRoutes from "./router/authRoutes";
 import routes from "./router/routes";
 import cors from "cors";
 import trackRoutes from "./router/trackRoutes";
-
+import tradingRoutes from "./router/tradingRoutes";
 const app = express();
 
 // Allow requests from frontend
@@ -14,10 +14,9 @@ const app = express();
 app.use(
   cors({
     origin: [
-      // "http://localhost:3000",
-      // "https://dps-homepage-front-p5pd.vercel.app",
-      // https://dps-homepage-front.vercel.app/
-      "https://www.metaselferral.com", // ✅ Add this line
+      "http://localhost:3000",
+      "https://www.metaselferral.com",
+      "https://api.metaselferral.com", // ★ REQUIRED ★
     ],
     credentials: true,
   })
@@ -33,5 +32,6 @@ app.get("/", (req, res) => {
 app.use("/api/admin", authRoutes);
 app.use("/api/user", routes);
 app.use("/api/visitors", trackRoutes);
+app.use("/api/trading", tradingRoutes);
 
 export default app;
